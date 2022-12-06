@@ -65,16 +65,21 @@ public class BlockPassthroughAbility extends AbstractEventAbility
 	{
 		if(event.phase == Phase.START)
 		{
-			trackedPlayers.forEach(uuid -> 
+			HashSet<UUID> tracked = (HashSet<UUID>) trackedPlayers.clone();
+			tracked.forEach(uuid -> 
 			{
-				// This is not particularly efficient.
-				if(!wasInWeb.contains(uuid))
-				{
-					PlayerEntity player = ServerSetup.server.getPlayerList().getPlayerByUUID(uuid);
-					player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(am);
+				try{
+					// This is not particularly efficient.
+					if(!wasInWeb.contains(uuid))
+					{
+						PlayerEntity player = ServerSetup.server.getPlayerList().getPlayerByUUID(uuid);
+						player.getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(am);
+					}
+					
+					wasInWeb.clear();
+				}catch(NullPointerException e){
+					trackedPlayers.remove(uuid);
 				}
-				
-				wasInWeb.clear();
 			});
 		}
 	}
